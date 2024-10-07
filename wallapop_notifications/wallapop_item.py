@@ -13,3 +13,6 @@ class WallapopItem:
 
     def __str__(self):
         return f"{self.title} ({self.price})"
+
+    def is_empty(self):
+        return len(self.title) + len(self.price) + len(self.link) == 0

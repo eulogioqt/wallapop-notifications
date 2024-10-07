@@ -1,2 +1,3 @@
 from .wallapop_item import WallapopItem
 from .wallapop_scraper import WallapopScraper
+from .wallapop_notifications import WallapopNotifications
