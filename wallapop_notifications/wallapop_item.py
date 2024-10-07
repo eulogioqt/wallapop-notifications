@@ -6,11 +6,10 @@ class WallapopItem:
         self.link = link
 
     def __eq__(self, other):
-        if isinstance(other, WallapopItem):
-            return (self.title == other.title and
-                    self.price == other.price and
-                    self.link == other.link)
-        return False
+        if not isinstance(other, WallapopItem):
+            return False
+        
+        return self.title == other.title and  self.price == other.price and self.link == other.link
 
     def __str__(self):
-        return f"Title: {self.title} | Price: {self.price} | Link: {self.link}"
+        return f"{self.title} ({self.price})"
