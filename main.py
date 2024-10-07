@@ -1,8 +1,7 @@
 import time
 from datetime import datetime
 from wallapop_notifications import WallapopScraper
-# puede pasar q en el primero coja 10 items y luego 20 y aunque sean mas antiguos lo ponga como mas nuevo
-# la primera llamada sale el orden al reves
+
 driver_path = "D:/Programas/ChromeDriver/chromedriver.exe"
 topic = "raspberry"
 

@@ -17,7 +17,7 @@ class WallapopScraper:
         chrome_options.add_argument("--disable-dev-shm-usage") 
         
         self.driver = webdriver.Chrome(service=Service(driver_path), options=chrome_options)
-        self.url = f"https://es.wallapop.com/app/search?filters_source=quick_filters&keywords={topic}&longitude=-3.69196&latitude=40.41956&order_by=newest" 
+        self.url = f"https://es.wallapop.com/app/search?filters_source=quick_filters&keywords={topic}&order_by=newest" 
 
     def get_item(self, web_item):
         title = web_item.find_element(By.CSS_SELECTOR, ".ItemCard__title").text
@@ -58,8 +58,5 @@ class WallapopScraper:
 
         except Exception:
             print("Ha habido algún error obteniendo los items")
-            
-        #self.driver.close()
-        print("Cerrando chrome driver...")
 
         return wallapop_items
