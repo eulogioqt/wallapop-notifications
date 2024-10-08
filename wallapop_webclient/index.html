@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallapop Notifications</title>
+</head>
+
+<body>
+    <h1>Wallapop Notifications</h1>
+    <div>
+        <input type="text" id="messageInput" placeholder="Escribe un mensaje">
+        <button onclick="sendMessage()">Enviar</button>
+    </div>
+    <div id="messages"
+        style="margin-top: 20px; border: 1px solid #000; padding: 10px; height: 200px; overflow-y: scroll;">
+    </div>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:8765');
+
+        ws.onopen = () => {
+            console.log('Conectado al servidor WebSocket');
+        };
+
+        ws.onmessage = (event) => {
+            const messagesDiv = document.getElementById('messages');
+            const newMessage = document.createElement('p');
+            newMessage.textContent = `Servidor: ${event.data}`;
+            messagesDiv.appendChild(newMessage);
+        };
+
+        ws.onclose = () => {
+            console.log('Desconectado del servidor WebSocket');
+        };
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+
+            if (message) {
+                ws.send(message);
+
+                const messagesDiv = document.getElementById('messages');
+                const newMessage = document.createElement('p');
+                newMessage.textContent = `Tú: ${message}`;
+                messagesDiv.appendChild(newMessage);
+
+                messageInput.value = '';
+            }
+        }
+    </script>
+</body>
+
+</html>
