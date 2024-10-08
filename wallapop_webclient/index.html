@@ -8,41 +8,66 @@
 </head>
 
 <body>
-    <h1>Wallapop Notifications</h1>
+    <div style="display: flex; align-items: center; justify-content: center;">
+        <div style="margin-right: 16px;">
+            <h1>Wallapop Notifications</h1>
+        </div>
+
+        <div id="connected" style="width: 32px; height: 32px; border-radius: 100%; background-color: black;">
+
+        </div>
+    </div>
+
     <div>
         <input type="text" id="messageInput" placeholder="Escribe un mensaje">
         <button onclick="sendMessage()">Enviar</button>
     </div>
+
     <div id="messages"
         style="margin-top: 20px; border: 1px solid #000; padding: 10px; height: 200px; overflow-y: scroll;">
     </div>
 
     <script>
-        const ws = new WebSocket('ws://localhost:8765');
+        const messagesDiv = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
 
-        ws.onopen = () => {
-            console.log('Conectado al servidor WebSocket');
-        };
+        const connectedDiv = document.getElementById('connected');
 
-        ws.onmessage = (event) => {
-            const messagesDiv = document.getElementById('messages');
-            const newMessage = document.createElement('p');
-            newMessage.textContent = `Servidor: ${event.data}`;
-            messagesDiv.appendChild(newMessage);
-        };
+        let ws = undefined;
 
-        ws.onclose = () => {
-            console.log('Desconectado del servidor WebSocket');
-        };
+        function connect() {
+            ws = new WebSocket('ws://localhost:8765');
+
+            ws.onopen = () => {
+                console.log('Conectado al servidor WebSocket');
+                connectedDiv.style.backgroundColor = "green";
+            };
+
+            ws.onmessage = (event) => {
+                const newMessage = document.createElement('p');
+                newMessage.textContent = `Servidor: ${event.data}`;
+                messagesDiv.appendChild(newMessage);
+            };
+
+            ws.onclose = () => {
+                console.log('Desconectado del servidor WebSocket');
+                ws = undefined;
+                connectedDiv.style.backgroundColor = "red";
+                setTimeout(connect, 5000); // 5ms
+            };
+        }
 
         function sendMessage() {
-            const messageInput = document.getElementById('messageInput');
+            if (ws === undefined || ws.readyState !== WebSocket.OPEN) {
+                console.log("No estás conectado al servidor");
+                return;
+            }
+
             const message = messageInput.value;
 
             if (message) {
                 ws.send(message);
 
-                const messagesDiv = document.getElementById('messages');
                 const newMessage = document.createElement('p');
                 newMessage.textContent = `Tú: ${message}`;
                 messagesDiv.appendChild(newMessage);
@@ -50,6 +75,8 @@
                 messageInput.value = '';
             }
         }
+
+        connect();
     </script>
 </body>
 
