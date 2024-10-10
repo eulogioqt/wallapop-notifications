@@ -1,6 +1,7 @@
-from utils import log, sleep
+from utils import log, Sleep
 
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -18,7 +19,7 @@ class WallapopScraper:
         chrome_options.add_argument("--disable-software-rasterizer")
         chrome_options.add_argument("--log-level=3")  # Desactiva los mensajes de log de nivel INFO y ERROR
         chrome_options.add_argument("--silent")  # Hace que Chrome sea silencioso
-        chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])  # Desactiva los logs de DevTools
+        # chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])  # Bugea el cerrado de chrome driver
         if headless:
             chrome_options.add_argument("--headless") 
 
@@ -28,14 +29,15 @@ class WallapopScraper:
         self.scraps_done = 0
 
     def close(self):
-        self.driver.quit()
+        if self.driver:
+            self.driver.quit()
 
     def do_get(self, url):
         self.driver.get(url)
 
     def click_accept_button(self):
         accept_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Aceptar todo')]")))
-        accept_button.click() # Aceptar Cookies
+        accept_button.click()
 
     def click_skip_button(self):
         skip_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//walla-button[contains(@class, 'TooltipWrapper__skip')]")))
@@ -70,17 +72,17 @@ class WallapopScraper:
             try:
                 self.click_accept_button()
                 log("Click en Aceptar Todo")
-            except Exception:
+            except WebDriverException:
                 pass # No está el botón
 
             try:
                 for i in range(3):
                     self.click_skip_button()
                     log(f"Click en Saltar ({i + 1}/3)")
-            except Exception:
+            except WebDriverException:
                 pass # No está el botón 
         else:
-            sleep(5, "Esperando a que carguen los items (%ds)", self.verbose_sleep)
+            Sleep.sleep(5, "Esperando a que carguen los items (%ds)", self.verbose_sleep)
 
         try:
             log("Buscando items...")
@@ -91,7 +93,7 @@ class WallapopScraper:
                     log("Se ha detectado un item vacio")
                 else:
                     wallapop_items.append(wallapop_item)
-        except Exception:
+        except WebDriverException:
             log("ERROR: Se ha producido un problema al obtener items")
 
         self.scraps_done = self.scraps_done + 1

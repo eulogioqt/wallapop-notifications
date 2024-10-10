@@ -1,1 +1,1 @@
-from .utils import log, sleep
+from .utils import log, Sleep

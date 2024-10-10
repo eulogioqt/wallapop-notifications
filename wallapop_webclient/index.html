@@ -14,7 +14,6 @@
         </div>
 
         <div id="connected" style="width: 32px; height: 32px; border-radius: 100%; background-color: black;">
-
         </div>
     </div>
 
@@ -47,6 +46,7 @@
                 const newMessage = document.createElement('p');
                 newMessage.textContent = `Servidor: ${event.data}`;
                 messagesDiv.appendChild(newMessage);
+                scrollToBottom();
             };
 
             ws.onclose = () => {
@@ -73,7 +73,12 @@
                 messagesDiv.appendChild(newMessage);
 
                 messageInput.value = '';
+                scrollToBottom(); // Llama a la función para desplazar hacia abajo
             }
+        }
+
+        function scrollToBottom() {
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
 
         connect();
