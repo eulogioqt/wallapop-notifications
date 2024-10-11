@@ -1,3 +1,4 @@
+import datetime
 import asyncio
 import websockets
 import webbrowser
@@ -48,7 +49,8 @@ async def broadcast():
                     item = queue.get()
                     log(f"Enviando: {item}")
 
-                    await asyncio.gather(*[send_message(client, item) for client in clients]) # LO SABIA RETURNS EXCEPTION
+                    msg = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S") + ' ' + str(item) + ' <a href="' + item.link + '" target="_blank">link</a>'
+                    await asyncio.gather(*[send_message(client, msg) for client in clients]) # LO SABIA RETURNS EXCEPTION
                     await asyncio.sleep(0)
             else:
                 await asyncio.sleep(1)
@@ -91,7 +93,7 @@ if __name__ == "__main__":
     base_dir = os.path.dirname(os.path.abspath(__file__))
     relative_path = 'wallapop_webclient/index.html'
     file_path = os.path.join(base_dir, relative_path)
-    
+
     url = f'file://{file_path}'
     webbrowser.open(url)
 

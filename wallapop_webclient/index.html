@@ -43,8 +43,8 @@
             };
 
             ws.onmessage = (event) => {
-                const newMessage = document.createElement('p');
-                newMessage.textContent = `Servidor: ${event.data}`;
+                const newMessage = document.createElement('div');
+                newMessage.innerHTML = `Servidor: ${event.data}`;
                 messagesDiv.appendChild(newMessage);
                 scrollToBottom();
             };
@@ -68,8 +68,8 @@
             if (message) {
                 ws.send(message);
 
-                const newMessage = document.createElement('p');
-                newMessage.textContent = `Tú: ${message}`;
+                const newMessage = document.createElement('div');
+                newMessage.innerHTML = `Tú: ${message}`;
                 messagesDiv.appendChild(newMessage);
 
                 messageInput.value = '';
