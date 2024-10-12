@@ -39,6 +39,12 @@
 
             ws.onopen = () => {
                 console.log('Conectado al servidor WebSocket');
+
+                const newMessage = document.createElement('div');
+                newMessage.innerHTML = `<span style="color: green; font-weight: bold;">CONEXIÓN ESTABLECIDA</span>`;
+                messagesDiv.appendChild(newMessage);
+                scrollToBottom();
+
                 connectedDiv.style.backgroundColor = "green";
             };
 
@@ -49,9 +55,19 @@
                 scrollToBottom();
             };
 
+            ws.on
+
             ws.onclose = () => {
                 console.log('Desconectado del servidor WebSocket');
                 ws = undefined;
+
+                if (connectedDiv.style.backgroundColor == "green") {
+                    const newMessage = document.createElement('div');
+                    newMessage.innerHTML = `<span style="color: red; font-weight: bold;">CONEXIÓN PERDIDA</span>`;
+                    messagesDiv.appendChild(newMessage);
+                    scrollToBottom();
+                }
+
                 connectedDiv.style.backgroundColor = "red";
                 setTimeout(connect, 5000); // 5ms
             };
