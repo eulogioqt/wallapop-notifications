@@ -94,7 +94,7 @@ class WallapopScraper:
                 else:
                     wallapop_items.append(wallapop_item)
         except WebDriverException:
-            log("ERROR: Se ha producido un problema al obtener items")
+            pass # Estudiar estos errores
 
         self.scraps_done = self.scraps_done + 1
 

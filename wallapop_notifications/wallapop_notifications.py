@@ -21,6 +21,8 @@ class WallapopNotifications:
         try:
             while self.running:
                 wallapop_items = self.wallapop_scraper.get_items()
+                if not self.running: # Por si se ha detenido durante el Scrapping
+                    break
 
                 if self.wallapop_scraper.scraps_done > 1:
                     log(f"Scrap realizado, analizando {len(wallapop_items)} items.")
@@ -41,5 +43,8 @@ class WallapopNotifications:
                     log(f"Memoria inicializada con los {len(self.seen_items)} últimos items. A partir de ahora se le notificará de cada nuevo item publicado.")
                 
                 Sleep.sleep(60, "Nueva petición en %ds", verbose=self.verbose_sleep)
+        
+        except KeyboardInterrupt: pass
+        except Exception: pass
         finally:
             log("Wallapop Notifications detenido.")
