@@ -6,20 +6,19 @@ from utils import log
 
 class WebsocketServer:
 
-    def __init__(self, on_message):
+    def __init__(self, on_message, on_user_connect, on_user_disconnect, port=8765):
+        self.port = port
+
         self.on_message = on_message
+        self.on_user_connect = on_user_connect
+        self.on_user_disconnect = on_user_disconnect
 
         self.clients = set()
         self.queue = Queue()
         self.stop_event = asyncio.Event()
 
-    def run(self):
-        try: 
-            asyncio.run(self.main())
-        except KeyboardInterrupt: pass
-        except Exception: pass
-        finally: 
-            log("Wallapop Server detenido.")
+    def get_connection_count(self):
+        return len(self.clients)
 
     def broadcast_message(self, msg):
         self.queue.put(msg)
@@ -28,10 +27,13 @@ class WebsocketServer:
         if not self.stop_event.is_set():
             self.stop_event.set()
 
-    async def handler(self, websocket, path):
+    async def handler(self, websocket, path): # Hacer objeto websocket propio para wrappear al de websockets y tener abstraccion
+        client_ip, client_port = websocket.remote_address
+
         self.clients.add(websocket)
-        log("Cliente conectado")
-        await self.send_message(websocket, "Conectado correctamente. Serás notificado de los nuevos productos en wallapop.")
+        response = self.on_user_connect(client_ip, client_port)
+        if response is not None:
+            await self.send_message(websocket, response)
 
         try:
             async for message in websocket:
@@ -39,12 +41,12 @@ class WebsocketServer:
                 response = self.on_message(message)
                 if response is not None:
                     await self.send_message(websocket, response)
-
-            log("Cliente desconectado") # Aqui se ejecuta si es una desconexion normal, si no, no ejecuta esta parte
+                    
         except Exception as e:
             log(f"Error en el cliente: {e}")
         finally:
             self.clients.remove(websocket)
+            self.on_user_disconnect(client_ip, client_port)
 
     async def broadcast(self):
         try:
@@ -67,10 +69,9 @@ class WebsocketServer:
             log(f"Error al enviar mensaje al cliente: {e}")
 
     async def websocket_server(self):
-        log("Iniciando servidor WebSocket...")
         try:
-            async with websockets.serve(self.handler, "localhost", 8765):
-                log("Servidor WebSocket en ejecución en ws://localhost:8765")
+            async with websockets.serve(self.handler, "0.0.0.0", self.port):
+                log(f"Servidor WebSocket abierto en el puerto {self.port}")
                 await self.stop_event.wait()
         finally:
             for client in self.clients:
@@ -86,3 +87,10 @@ class WebsocketServer:
             await asyncio.gather(websocket_task, broadcast_task)
         finally:
             self.stop_program()
+
+    def run(self):
+        try: 
+            asyncio.run(self.main())
+        except KeyboardInterrupt: pass
+        except Exception: pass
+        finally: pass
