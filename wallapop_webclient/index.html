@@ -35,7 +35,11 @@
         let ws = undefined;
 
         function connect() {
-            ws = new WebSocket('ws://localhost:8765');
+            const serverIp = window.location.hostname;
+            const connectedWithIP = serverIp !== undefined && serverIp.length > 0
+            console.log("Conectado mediante Servidor Web: ", connectedWithIP)
+
+            ws = new WebSocket(`ws://${serverIp}:8765`);
 
             ws.onopen = () => {
                 console.log('Conectado al servidor WebSocket');

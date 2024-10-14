@@ -46,5 +46,3 @@ class WallapopNotifications:
         
         except KeyboardInterrupt: pass
         except Exception: pass
-        finally:
-            log("Wallapop Notifications detenido.")

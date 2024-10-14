@@ -37,7 +37,6 @@ class WebsocketServer:
 
         try:
             async for message in websocket:
-                log(f"Mensaje recibido: {message}")
                 response = self.on_message(message)
                 if response is not None:
                     await self.send_message(websocket, response)
@@ -60,7 +59,7 @@ class WebsocketServer:
                 else:
                     await asyncio.sleep(1)
         finally:
-            log("Tarea Broadcast detenida.")
+            pass
 
     async def send_message(self, client, message):
         try:
@@ -71,13 +70,10 @@ class WebsocketServer:
     async def websocket_server(self):
         try:
             async with websockets.serve(self.handler, "0.0.0.0", self.port):
-                log(f"Servidor WebSocket abierto en el puerto {self.port}")
                 await self.stop_event.wait()
         finally:
             for client in self.clients:
                 await client.close()
-
-            log("Tarea WebSocket detenida.")
 
     async def main(self):    
         websocket_task = asyncio.create_task(self.websocket_server())
