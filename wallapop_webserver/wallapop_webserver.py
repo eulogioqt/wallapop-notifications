@@ -1,10 +1,8 @@
-import threading
-import webbrowser
+from utils import log
 
-from utils import log, get_local_ip
-
-from .websocket_server import WebsocketServer
+from .websocket_server import WebSocketServer
 from .http_server import HTTPServer
+from .websocket_thread_mixer import WebSocketThreadMixer
 from wallapop_notifications import WallapopNotifications
 
 class WallapopWebserver:
@@ -14,9 +12,9 @@ class WallapopWebserver:
         self.topic = topic
         self.headless = headless
 
-        self.wallapop_notifications = WallapopNotifications(driver_path, topic, headless=headless)
-        self.websocket_server = WebsocketServer(self.on_message, self.on_user_connect, self.on_user_disconnect)
-        self.http_server = HTTPServer(host="0.0.0.0", port=8080)
+        self.wallapop_notifications = WallapopNotifications(driver_path, topic, self.notification_callback, headless)
+        self.websocket_server = WebSocketServer(self.on_message, self.on_user_connect, self.on_user_disconnect)
+        self.http_server = HTTPServer("0.0.0.0", 8080)
 
     def on_message(self, msg):
         log(f"Mensaje recibido: {msg}")
@@ -43,25 +41,5 @@ class WallapopWebserver:
         self.websocket_server.broadcast_message(str(wallapop_item) + ' <a href="' + wallapop_item.link + '" target="_blank">AQUI</a>')
 
     def run(self):
-        webbrowser.open(f"http://{get_local_ip()}:8080")
-
-        wallapop_notifications_thread = threading.Thread(target=self.wallapop_notifications.run, args=(self.notification_callback,), daemon=False)
-        wallapop_notifications_thread.start()
-
-        http_server_thread = threading.Thread(target=self.http_server.start, daemon=False)
-        http_server_thread.start()
-
-        try:
-            self.websocket_server.run()
-        finally:
-            log("Websocket Server finalizado.")
-
-            self.wallapop_notifications.stop()
-            wallapop_notifications_thread.join()
-            log("Wallapop Notifications finalizado.")
-
-            self.http_server.stop()
-            http_server_thread.join()
-            log("HTTP Server finalizado.")
-
-            log("Programa terminado.")
+        websocket_thread_mixer = WebSocketThreadMixer(self.websocket_server, self.wallapop_notifications, self.http_server)
+        websocket_thread_mixer.run()

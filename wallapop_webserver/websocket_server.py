@@ -4,7 +4,7 @@ import websockets
 from queue import Queue
 from utils import log
 
-class WebsocketServer:
+class WebSocketServer:
 
     def __init__(self, on_message, on_user_connect, on_user_disconnect, port=8765):
         self.port = port
