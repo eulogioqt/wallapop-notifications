@@ -1,108 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <!--<link rel="icon" type="image/svg+xml" href="/vite.svg" />-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wallapop Notifications</title>
 </head>
 
 <body>
-    <div style="display: flex; align-items: center; justify-content: center;">
-        <div style="margin-right: 16px;">
-            <h1>Wallapop Notifications</h1>
-        </div>
-
-        <div id="connected" style="width: 32px; height: 32px; border-radius: 100%; background-color: black;">
-        </div>
-    </div>
-
-    <div>
-        <input type="text" id="messageInput" placeholder="Escribe un mensaje">
-        <button onclick="sendMessage()">Enviar</button>
-    </div>
-
-    <div id="messages"
-        style="margin-top: 20px; border: 1px solid #000; padding: 10px; height: 200px; overflow-y: scroll;">
-    </div>
-
-    <script>
-        const messagesDiv = document.getElementById('messages');
-        const messageInput = document.getElementById('messageInput');
-
-        const connectedDiv = document.getElementById('connected');
-
-        let ws = undefined;
-
-        function connect() {
-            const serverIp = window.location.hostname;
-            const connectedWithIP = serverIp !== undefined && serverIp.length > 0
-            console.log("Conectado mediante Servidor Web: ", connectedWithIP)
-
-            ws = new WebSocket(`ws://${serverIp}:8765`);
-
-            ws.onopen = () => {
-                console.log('Conectado al servidor WebSocket');
-
-                const newMessage = document.createElement('div');
-                newMessage.innerHTML = `<span style="color: green; font-weight: bold;">CONEXIÓN ESTABLECIDA</span>`;
-                messagesDiv.appendChild(newMessage);
-                scrollToBottom();
-
-                connectedDiv.style.backgroundColor = "green";
-            };
-
-            ws.onmessage = (event) => {
-                const newMessage = document.createElement('div');
-                newMessage.innerHTML = `Servidor: ${event.data}`;
-                messagesDiv.appendChild(newMessage);
-                scrollToBottom();
-            };
-
-            ws.on
-
-            ws.onclose = () => {
-                console.log('Desconectado del servidor WebSocket');
-                ws = undefined;
-
-                if (connectedDiv.style.backgroundColor == "green") {
-                    const newMessage = document.createElement('div');
-                    newMessage.innerHTML = `<span style="color: red; font-weight: bold;">CONEXIÓN PERDIDA</span>`;
-                    messagesDiv.appendChild(newMessage);
-                    scrollToBottom();
-                }
-
-                connectedDiv.style.backgroundColor = "red";
-                setTimeout(connect, 5000); // 5ms
-            };
-        }
-
-        function sendMessage() {
-            if (ws === undefined || ws.readyState !== WebSocket.OPEN) {
-                console.log("No estás conectado al servidor");
-                return;
-            }
-
-            const message = messageInput.value;
-
-            if (message) {
-                ws.send(message);
-
-                const newMessage = document.createElement('div');
-                newMessage.innerHTML = `Tú: ${message}`;
-                messagesDiv.appendChild(newMessage);
-
-                messageInput.value = '';
-                scrollToBottom(); // Llama a la función para desplazar hacia abajo
-            }
-        }
-
-        function scrollToBottom() {
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        connect();
-    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
 </body>
 
 </html>
